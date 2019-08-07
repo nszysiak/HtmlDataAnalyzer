@@ -4,7 +4,7 @@ import config
 import os
 
 
-def create_dir():
+def createDirectory():
     path = config.CLICK_ANALYSIS_DIR
     try:
         os.mkdir(path)
@@ -31,7 +31,7 @@ def runClicksAnalysis():
     ClicksDF.createOrReplaceTempView("clicks")
 
     # Create dir
-    create_dir()
+    createDirectory()
 
     # Set Window
     w = Window.partitionBy('URL')

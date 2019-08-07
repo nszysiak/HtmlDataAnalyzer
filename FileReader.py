@@ -1,9 +1,8 @@
 import py7zlib
 import os
-import config
 
 
-class FileReader(object):
+class ZipFileReader:
 
             def __init__(self, file_path):
                 fp = open(file_path, 'rb')
@@ -32,12 +31,6 @@ class FileReader(object):
                     outfile = open(out_file_name, 'wb')
                     outfile.write(self.archive.getmember(name).read())
                     outfile.close()
-
-
-if __name__ == '__main__':
-    file = FileReader(file_path=config.ARCHIVE_FILE_PATH + config.FILE_NAME)
-    if file.is_7zfile(file_path=config.ARCHIVE_FILE_PATH + config.FILE_NAME):
-        file.extract_files(path=config.ARCHIVE_FILE_PATH)
 
 
 

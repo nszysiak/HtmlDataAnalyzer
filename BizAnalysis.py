@@ -3,28 +3,40 @@ import csv, io
 import config
 
 
-def list_to_csv_str(x):
+def parse_line(line):
+
+    """Function parse line of text file and returns determined fields"""
+
+    fields = line.split('\t')
+    ID = str(fields[1])
+    desc = str(fields[4])
+    name = str(fields[2])
+    return ID, desc, name
+
+
+def csv_converter(line):
+
+    """From list of str, function returns a csv string."""
+
     output = io.StringIO("")
-    csv.writer(output).writerow(x)
-    return output.getvalue().strip() # remove extra newline
+    csv.writer(output, delimiter='\t').writerow(line)
+    return output.getvalue().strip()
 
 
-def runBizAnalysis():
-    conf = SparkConf().setMaster("local[*]").setAppName("PopularMovies")
+def main():
+
+    """The main function creates sc, reads biz file, creates
+    RDD on that, simultaneously parsing each line. Finally
+    it converts an outcome of RDD to proper-csv-formatted file."""
+
+    conf = SparkConf().setMaster("local[*]").setAppName("RunBizAnalysis")
     sc = SparkContext(conf = conf)
 
-    def parseLine(line):
-        fields = line.split('\t')
-        ID = str(fields[1])
-        desc = str(fields[4])
-        name = str(fields[2])
-        return ID, desc, name
-
-    lines = sc.textFile("biz")
-    parsedLines = lines.map(parseLine)
-    movies = parsedLines.map(list_to_csv_str)
-    movies.saveAsTextFile(config.BIZ_ANALYSIS_DIR)
+    lines = sc.textFile(config.BIZ_FILE_TO_PROC)
+    parsed_lines = lines.map(parse_line)
+    csv_line = parsed_lines.map(csv_converter)
+    csv_line.saveAsTextFile(config.BIZ_ANALYSIS_DIR)
 
 
 if __name__ == '__main__':
-    runBizAnalysis()
+    main()
